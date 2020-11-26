@@ -12,29 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
-  name: locust-worker
+  name: locust-master
   labels:
-    name: locust-worker
+    name: locust-master
 spec:
-  replicas: 5
+  replicas: 1
   selector:
     matchLabels:
-      app: locust-worker
+      app: locust-master
   template:
     metadata:
       labels:
-        app: locust-worker
+        app: locust-master
     spec:
       containers:
-        - name: locust-worker
-          image: gcr.io/[PROJECT_ID]/locust-tasks:latest
+        - name: locust-master
+          image: gcr.io/$PROJECT/locust-tasks:latest
+          resources:
+            limits:
+              cpu: 500m
+              memory: 300Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: locustfile-volume
+              mountPath: /locust-tasks
           env:
             - name: LOCUST_MODE
-              value: worker
-            - name: LOCUST_MASTER
-              value: locust-master
-            - name: TARGET_HOST
-              value: https://[TARGET_HOST]
+              value: master
+          ports:
+            - name: loc-master-web
+              containerPort: 8089
+              protocol: TCP
+            - name: loc-master-p1
+              containerPort: 5557
+              protocol: TCP
+      volumes:
+        - name: locustfile-volume
+          configMap:
+            name: locustfile

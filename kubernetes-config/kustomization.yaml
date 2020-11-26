@@ -1,0 +1,9 @@
+resources:
+- locust-master-controller.yaml
+- locust-master-service.yaml
+- locust-worker-controller.yaml
+
+configMapGenerator:
+- name: locustfile
+  files:
+  - locustfile.py

@@ -14,22 +14,23 @@
 
 
 # Start with a base Python 3.7.2 image
-FROM python:3.7.2
+FROM python:3.8
 
 # Add the licenses for third party software and libraries
 ADD licenses /licenses
 
-# Add the external tasks directory into /tasks
-ADD locust-tasks /locust-tasks
+COPY requirements.txt /requirements.txt
 
 # Install the required dependencies via pip
-RUN pip install -r /locust-tasks/requirements.txt
+RUN pip install -r /requirements.txt
 
 # Expose the required Locust ports
-EXPOSE 5557 5558 8089
+EXPOSE 5557 8089
 
 # Set script to be executable
-RUN chmod 755 /locust-tasks/run.sh
+RUN mkdir /locust-tasks
+COPY run.sh /run.sh
+RUN chmod 755 /run.sh
 
 # Start Locust using LOCUS_OPTS environment variable
-ENTRYPOINT ["/locust-tasks/run.sh"] 
+CMD ["/run.sh"] 

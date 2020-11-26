@@ -18,10 +18,9 @@
 import uuid
 
 from datetime import datetime
-from locust import HttpLocust, TaskSet, task
+from locust import HttpUser, task
 
-
-class MetricsTaskSet(TaskSet):
+class SampleWebLoadTest(HttpUser):
     _deviceid = None
 
     def on_start(self):
@@ -30,13 +29,10 @@ class MetricsTaskSet(TaskSet):
     @task(1)
     def login(self):
         self.client.post(
-            '/login', {"deviceid": self._deviceid})
+                "/login",
+                {"deviceid": self._deviceid})
 
     @task(999)
     def post_metrics(self):
         self.client.post(
             "/metrics", {"deviceid": self._deviceid, "timestamp": datetime.now()})
-
-
-class MetricsLocust(HttpLocust):
-    task_set = MetricsTaskSet
